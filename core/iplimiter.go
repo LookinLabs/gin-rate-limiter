@@ -10,6 +10,7 @@ import (
 func (ipl *IPLimiter) GetItem(ctx *gin.Context) (*RateLimiterItem, error) {
 	ip := ctx.ClientIP()
 
+	// Use mutex to ensure thread-safe access to ipl.Items map. Github Copilot can explain it perfectly.
 	ipl.Lock()
 	defer ipl.Unlock()
 
