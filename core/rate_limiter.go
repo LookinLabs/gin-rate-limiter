@@ -50,6 +50,7 @@ func getRateLimiterInstance(rateLimiterType RateLimiterType, ip string, option R
 		ipLimiterMap[ip] = ipRateLimiter
 
 		return ipRateLimiter, nil
+
 	default:
 		return nil, fmt.Errorf("rateLimiterType %v is not supported", rateLimiterType)
 	}

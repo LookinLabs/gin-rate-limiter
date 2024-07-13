@@ -12,16 +12,16 @@ type IPLimiter struct {
 	RateLimiter
 }
 
+type IRateLimiter interface {
+	GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error)
+}
+
 type RateLimiter struct {
 	sync.Mutex
 	RateLimiterType RateLimiterType
 	Key             string
 	Option          RateLimiterOption
 	Items           map[string]*RateLimiterItem
-}
-
-type IRateLimiter interface {
-	GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error)
 }
 
 type RateLimiterType int
