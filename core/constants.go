@@ -1,4 +1,4 @@
-package core
+package corev2
 
 import (
 	"time"
@@ -7,14 +7,9 @@ import (
 )
 
 const (
-	IPLimiterWindowLen            = 1 * time.Second
-	IPLimiterBurst                = 15
-	IPLimiterLimit     rate.Limit = 1
-)
-
-const (
-	IPRateLimiter RateLimiterType = iota
+	IPLimiterWindowLen                 = 1 * time.Second
+	IPLimiterBurst                     = 15
+	IPLimiterLimit     rate.Limit      = 1
+	IPRateLimiter      RateLimiterType = iota
 	JWTRateLimiter
 )
-
-type RateLimiterType int

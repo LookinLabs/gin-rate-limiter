@@ -1,4 +1,4 @@
-package core
+package corev2
 
 import (
 	"time"
@@ -7,23 +7,22 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var (
-	ipLimiterIns map[string]*IPLimiter = make(map[string]*IPLimiter)
-)
+func (ipl *IPLimiter) GetItem(ctx *gin.Context) (*RateLimiterItem, error) {
+	ip := ctx.ClientIP()
 
-type IPLimiter struct {
-	RateLimiter
+	ipl.Lock()
+	defer ipl.Unlock()
+
+	if item, exists := ipl.Items[ip]; exists {
+		return item, nil
+	}
+
+	item := ipl.newItem(ip)
+	return item, nil
 }
 
 func newIPLimiter(key string, option RateLimiterOption) *IPLimiter {
-	mu.Lock()
-	defer mu.Unlock()
-
-	if ipLimiterIns[key] != nil {
-		return ipLimiterIns[key]
-	}
-
-	instance := &IPLimiter{
+	return &IPLimiter{
 		RateLimiter: RateLimiter{
 			RateLimiterType: IPRateLimiter,
 			Key:             key,
@@ -31,53 +30,14 @@ func newIPLimiter(key string, option RateLimiterOption) *IPLimiter {
 			Items:           make(map[string]*RateLimiterItem),
 		},
 	}
-	ipLimiterIns[key] = instance
-	return instance
 }
 
-type IPLimiterItem struct {
-	RateLimiterItem
-}
-
-func (m *IPLimiter) newItem(ip string) *RateLimiterItem {
-	if _, exist := ipLimiterIns[m.Key].Items[ip]; exist {
-		ipLimiterIns[m.Key].Items[ip] = nil
-	}
-
-	instance := RateLimiterItem{
+func (ipl *IPLimiter) newItem(ip string) *RateLimiterItem {
+	item := &RateLimiterItem{
 		Key:        ip,
-		Limiter:    rate.NewLimiter(m.Option.Limit, m.Option.Burst),
+		Limiter:    rate.NewLimiter(ipl.Option.Limit, ipl.Option.Burst),
 		LastSeenAt: time.Now(),
 	}
-	ipLimiterIns[m.Key].setItem(ip, &instance)
-
-	return &instance
-}
-
-func (m *IPLimiter) GetItem(ctx *gin.Context) (*RateLimiterItem, error) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	ip := ctx.ClientIP()
-	item, exist := ipLimiterIns[m.Key].Items[ip]
-	if !exist {
-		return m.newItem(ip), nil
-	}
-
-	if time.Since(item.LastSeenAt) > ipLimiterIns[m.Key].Option.Len {
-		return m.newItem(ip), nil
-	}
-
-	ipLimiterIns[m.Key].Items[ip].LastSeenAt = time.Now()
-	return item, nil
-}
-
-func (m *IPLimiter) setItem(ip string, item *RateLimiterItem) error {
-	if m.Items == nil {
-		m.Items = make(map[string]*RateLimiterItem)
-	}
-
-	m.Items[ip] = item
-
-	return nil
+	ipl.Items[ip] = item
+	return item
 }
