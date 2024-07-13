@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func StatusOK(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, data)
+func StatusOK(ctx *gin.Context, responseBody interface{}) {
+	ctx.JSON(http.StatusOK, responseBody)
 }
 
 func StatusBadRequest(ctx *gin.Context, err error) {
