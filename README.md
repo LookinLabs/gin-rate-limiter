@@ -28,7 +28,7 @@ The `gin-rate-limiter` package is designed to empower your Gin web applications 
 To install the `gin-rate-limiter` package, use the `go get` command:
 
 ```bash
-go get github.com/khaaleoo/gin-rate-limiter
+go get github.com/lookinlabs/gin-rate-limiter
 ```
 
 ## Usage
@@ -38,24 +38,24 @@ To create rate limiter instances, use the GetRateLimiterInstance function. Provi
 Example:
 ```go
 import (
-    "github.com/khaaleoo/gin-rate-limiter/core"
+    "github.com/lookinlabs/gin-rate-limiter/core"
 )
 
-func main() {
-	// max of 5 requests and then two more requests per second
-	// the rate limiter will reset after 10 second don't receive any requests by the same IP address
-	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(ratelimiter.RateLimiter{
+func RateLimiterMiddleware() gin.HandlerFunc {
+	// Create an IP rate limiter middleware
+	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(&ratelimiter.RateLimiter{
 		RateLimiterType: ratelimiter.IPRateLimiter,
-		Key:             "this_is_a_test_key",
+		Key:             "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
-			Limit: 2,
-			Burst: 5, // Maximum number of requests allowed to burst
-			Len:   10 * time.Second, // Time window
+			Limit:  1,
+			Burst:  500,
+			Window: 10 * time.Minute,
 		},
 	})
-    
-    // Use the ipRateLimiter middleware in your application
+
+	return rateLimiterMiddleware
 }
+
 ```
 
 ### Using the Rate Limiter Middleware
@@ -70,26 +70,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/khaaleoo/gin-rate-limiter/core"
+	"github.com/lookinlabs/gin-rate-limiter/core"
 )
 
 func Example() {
 	r := gin.Default()
-
-	// max of 100 requests and then five more requests per second
-	// the rate limiter will reset after 1 minute don't receive any requests by the same IP address
-	rateLimiterOption := ratelimiter.RateLimiterOption{
-		Limit: 5,
-		Burst: 100,
-		Len:   1 * time.Minute,
-	}
-
-	// Create an IP rate limiter instance
-	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(ratelimiter.RateLimiter{
-		RateLimiterType: ratelimiter.IPRateLimiter,
-		Key:             "iplimiter_maximum_requests_for_ip_test",
-		Option: rateLimiterOption,
-	})
 
 	// Apply rate limiter middleware to a route
 	r.GET("/limited-route", rateLimiterMiddleware, func(c *gin.Context) {

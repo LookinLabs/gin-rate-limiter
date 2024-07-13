@@ -1,33 +1,34 @@
-package example
+package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	ratelimiter "github.com/khaaleoo/gin-rate-limiter/core"
+	ratelimiter "github.com/lookinlabs/gin-rate-limiter/core"
 )
 
-func Example() {
-	router := gin.Default()
-
+func RateLimiterMiddleware() gin.HandlerFunc {
 	// Create an IP rate limiter middleware
-	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(ratelimiter.RateLimiter{
+	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(&ratelimiter.RateLimiter{
 		RateLimiterType: ratelimiter.IPRateLimiter,
 		Key:             "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
-			Limit: 1,
-			Burst: 1,
-			Len:   1 * time.Second,
+			Limit:  1,
+			Burst:  500,
+			Window: 10 * time.Minute,
 		},
 	})
 
-	// Apply rate limiter middleware to a route
-	router.GET("/limited-route", rateLimiterMiddleware, func(c *gin.Context) {
-		c.String(200, "Hello, rate-limited world!")
+	return rateLimiterMiddleware
+}
+
+func main() {
+	router := gin.Default()
+
+	// Apply the rate limiter middleware
+	router.GET("/me", RateLimiterMiddleware(), func(ctx *gin.Context) {
+		ratelimiter.StatusOK(ctx, gin.H{"message": "hello world"})
 	})
 
-	if err := router.Run(":8080"); err != nil {
-		log.Printf("failed to start the server: %v", err)
-	}
+	router.Run(":8080")
 }
