@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ipLimiterInstances = make(map[string]*IPLimiter)
-	ipLimiterMutex     sync.Mutex
+	ipLimiterMap   = make(map[string]*IPLimiter)
+	ipLimiterMutex sync.Mutex
 )
 
 func RequireRateLimiter(rateLimiters ...*RateLimiter) func(*gin.Context) {
@@ -21,13 +21,13 @@ func RequireRateLimiter(rateLimiters ...*RateLimiter) func(*gin.Context) {
 				return
 			}
 
-			item, err := instance.GetItem(ctx)
+			allowedIP, err := instance.GetConsumerIP(ctx)
 			if err != nil {
 				StatusInternalServerError(ctx, err)
 				return
 			}
 
-			if !item.Limiter.Allow() {
+			if !allowedIP.Limiter.Allow() {
 				StatusTooManyRequests(ctx, fmt.Errorf("too many requests"))
 				return
 			}
@@ -35,18 +35,21 @@ func RequireRateLimiter(rateLimiters ...*RateLimiter) func(*gin.Context) {
 	}
 }
 
-func getRateLimiterInstance(rateLimiterType RateLimiterType, key string, option RateLimiterOption) (IRateLimiter, error) {
+func getRateLimiterInstance(rateLimiterType RateLimiterType, ip string, option RateLimiterOption) (IRateLimiter, error) {
+	// Use mutex to ensure thread-safe access to ipl.Items map.
 	ipLimiterMutex.Lock()
 	defer ipLimiterMutex.Unlock()
 
 	switch rateLimiterType {
 	case IPRateLimiter:
-		if instance, exists := ipLimiterInstances[key]; exists {
-			return instance, nil
+		if ipRateLimiter, exists := ipLimiterMap[ip]; exists {
+			return ipRateLimiter, nil
 		}
-		instance := newIPLimiter(key, option)
-		ipLimiterInstances[key] = instance
-		return instance, nil
+
+		ipRateLimiter := newIPRateLimiter(ip, option)
+		ipLimiterMap[ip] = ipRateLimiter
+
+		return ipRateLimiter, nil
 	default:
 		return nil, fmt.Errorf("rateLimiterType %v is not supported", rateLimiterType)
 	}

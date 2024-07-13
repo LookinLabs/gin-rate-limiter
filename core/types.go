@@ -21,7 +21,7 @@ type RateLimiter struct {
 }
 
 type IRateLimiter interface {
-	GetItem(ctx *gin.Context) (*RateLimiterItem, error)
+	GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error)
 }
 
 type RateLimiterType int

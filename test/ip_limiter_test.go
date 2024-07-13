@@ -12,14 +12,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var wg sync.WaitGroup
+var (
+	wg             sync.WaitGroup
+	windowCapacity = 5
+	windowLen      = 1 * time.Second
+)
 
 func TestMaximumRequestsInAPeriod(testCase *testing.T) {
 	router := SetupRouter()
-
-	// Rate limiter configuration
-	WindowCapacity := 5
-	WindowLen := 1 * time.Second
 
 	// Fake requests
 	successCount := 0
@@ -32,8 +32,8 @@ func TestMaximumRequestsInAPeriod(testCase *testing.T) {
 		Key:             "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
 			Limit:  1,
-			Burst:  WindowCapacity,
-			Window: WindowLen,
+			Burst:  windowCapacity,
+			Window: windowLen,
 		},
 	})
 
@@ -71,10 +71,6 @@ func TestMaximumRequestsInAPeriod(testCase *testing.T) {
 func TestMaximumRequestInDifferentRoutesUsingSameMiddleware(testCase *testing.T) {
 	router := SetupRouter()
 
-	// Rate limiter configuration
-	WindowCapacity := 5
-	WindowLen := 1 * time.Second
-
 	// Fake requests
 	successCount := 0
 	errorCount := 0
@@ -87,8 +83,8 @@ func TestMaximumRequestInDifferentRoutesUsingSameMiddleware(testCase *testing.T)
 		Key:             "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
 			Limit:  1,
-			Burst:  WindowCapacity,
-			Window: WindowLen,
+			Burst:  windowCapacity,
+			Window: windowLen,
 		},
 	})
 	router.GET("/ping", rateLimiterMiddleware, func(ctx *gin.Context) {

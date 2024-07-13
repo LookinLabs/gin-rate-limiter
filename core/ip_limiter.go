@@ -7,22 +7,22 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func (ipl *IPLimiter) GetItem(ctx *gin.Context) (*RateLimiterItem, error) {
-	ip := ctx.ClientIP()
+func (ipl *IPLimiter) GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error) {
+	consumer := ctx.ClientIP()
 
-	// Use mutex to ensure thread-safe access to ipl.Items map. Github Copilot can explain it perfectly.
+	// Use mutex to ensure thread-safe access to ipl.Items map.
 	ipl.Lock()
 	defer ipl.Unlock()
 
-	if item, exists := ipl.Items[ip]; exists {
-		return item, nil
+	if ip, exists := ipl.Items[consumer]; exists {
+		return ip, nil
 	}
 
-	item := ipl.newItem(ip)
-	return item, nil
+	ip := ipl.newConsumerIP(consumer)
+	return ip, nil
 }
 
-func newIPLimiter(key string, option RateLimiterOption) *IPLimiter {
+func newIPRateLimiter(key string, option RateLimiterOption) *IPLimiter {
 	return &IPLimiter{
 		RateLimiter: RateLimiter{
 			RateLimiterType: IPRateLimiter,
@@ -33,7 +33,7 @@ func newIPLimiter(key string, option RateLimiterOption) *IPLimiter {
 	}
 }
 
-func (ipl *IPLimiter) newItem(ip string) *RateLimiterItem {
+func (ipl *IPLimiter) newConsumerIP(ip string) *RateLimiterItem {
 	item := &RateLimiterItem{
 		Key:        ip,
 		Limiter:    rate.NewLimiter(ipl.Option.Limit, ipl.Option.Burst),
