@@ -28,8 +28,7 @@ jobs:
           with:
             go-version: '1.22'
 
-        - name: Verify Backend Code Quality
-          uses: golangci/golangci-lint-action@v4
+        - uses: golangci/golangci-lint-action@v4
           with:
             version: v1.56.2
             working-directory: ./
@@ -37,6 +36,12 @@ jobs:
             args: --concurrency=16 --timeout=5m --out-format=github-actions --issues-exit-code=1
             skip-cache: false
             skip-pkg-cache: true
+
+        - name: Install gosec
+          run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+  
+        - name: Run gosec
+          run: gosec ./...
 
     verify_backend_functionality:
       name: Verify Backend Functionality
