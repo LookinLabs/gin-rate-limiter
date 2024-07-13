@@ -1,6 +1,7 @@
 package example
 
 import (
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,7 @@ import (
 )
 
 func Example() {
-	r := gin.Default()
+	router := gin.Default()
 
 	// Create an IP rate limiter middleware
 	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(ratelimiter.RateLimiter{
@@ -22,9 +23,11 @@ func Example() {
 	})
 
 	// Apply rate limiter middleware to a route
-	r.GET("/limited-route", rateLimiterMiddleware, func(c *gin.Context) {
+	router.GET("/limited-route", rateLimiterMiddleware, func(c *gin.Context) {
 		c.String(200, "Hello, rate-limited world!")
 	})
 
-	r.Run(":8080")
+	if err := router.Run(":8080"); err != nil {
+		log.Printf("failed to start the server: %v", err)
+	}
 }

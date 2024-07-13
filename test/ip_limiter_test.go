@@ -45,9 +45,9 @@ func TestMaximumRequestsInAPeriod(testCase *testing.T) {
 
 	for i := range requests {
 		wg.Add(1)
-		go func(i int) {
+		go func(_ int) {
 			defer wg.Done()
-			request := httptest.NewRequest("GET", "/me", nil)
+			request := httptest.NewRequest(http.MethodGet, "/me", nil)
 			response := httptest.NewRecorder()
 			router.ServeHTTP(response, request)
 			if response.Code == http.StatusOK {
@@ -99,9 +99,9 @@ func TestMaximumRequestInDifferentRoutesUsingSameMiddleware(testCase *testing.T)
 
 	for i := range requests {
 		wg.Add(1)
-		go func(i int) {
+		go func(_ int) {
 			defer wg.Done()
-			request := httptest.NewRequest("GET", "/me", nil)
+			request := httptest.NewRequest(http.MethodGet, "/me", nil)
 			response := httptest.NewRecorder()
 			router.ServeHTTP(response, request)
 			if response.Code == http.StatusOK {
@@ -114,9 +114,9 @@ func TestMaximumRequestInDifferentRoutesUsingSameMiddleware(testCase *testing.T)
 
 	for i := range requests {
 		wg.Add(1)
-		go func(i int) {
+		go func(_ int) {
 			defer wg.Done()
-			request := httptest.NewRequest("GET", "/ping", nil)
+			request := httptest.NewRequest(http.MethodGet, "/ping", nil)
 			response := httptest.NewRecorder()
 			router.ServeHTTP(response, request)
 			if response.Code == http.StatusOK {
