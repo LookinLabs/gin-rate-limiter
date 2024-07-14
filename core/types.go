@@ -19,7 +19,7 @@ type IRateLimiter interface {
 type RateLimiter struct {
 	sync.Mutex
 	RateLimiterType RateLimiterType
-	Key             string
+	Name             string
 	Option          RateLimiterOption
 	Items           map[string]*RateLimiterItem
 }
@@ -27,7 +27,7 @@ type RateLimiter struct {
 type RateLimiterType int
 
 type RateLimiterItem struct {
-	Key        string
+	Name        string
 	Limiter    *rate.Limiter
 	LastSeenAt time.Time
 }

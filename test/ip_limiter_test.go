@@ -29,7 +29,7 @@ func TestMaximumRequestsInAPeriod(testCase *testing.T) {
 
 	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(&ratelimiter.RateLimiter{
 		RateLimiterType: ratelimiter.IPRateLimiter,
-		Key:             "iplimiter_maximum_requests_for_ip_test",
+		Name:            "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
 			Limit:  1,
 			Burst:  windowCapacity,
@@ -80,7 +80,7 @@ func TestMaximumRequestInDifferentRoutesUsingSameMiddleware(testCase *testing.T)
 
 	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(&ratelimiter.RateLimiter{
 		RateLimiterType: ratelimiter.IPRateLimiter,
-		Key:             "iplimiter_maximum_requests_for_ip_test",
+		Name:            "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
 			Limit:  1,
 			Burst:  windowCapacity,

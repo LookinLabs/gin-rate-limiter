@@ -15,7 +15,7 @@ var (
 func RequireRateLimiter(rateLimiters ...*RateLimiter) func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		for _, rateLimiter := range rateLimiters {
-			instance, err := getRateLimiterInstance(rateLimiter.RateLimiterType, rateLimiter.Key, rateLimiter.Option)
+			instance, err := getRateLimiterInstance(rateLimiter.RateLimiterType, rateLimiter.Name, rateLimiter.Option)
 			if err != nil {
 				StatusInternalServerError(ctx, err)
 				return

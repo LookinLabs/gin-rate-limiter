@@ -11,7 +11,7 @@ func RateLimiterMiddleware() gin.HandlerFunc {
 	// Create an IP rate limiter middleware
 	rateLimiterMiddleware := ratelimiter.RequireRateLimiter(&ratelimiter.RateLimiter{
 		RateLimiterType: ratelimiter.IPRateLimiter,
-		Key:             "iplimiter_maximum_requests_for_ip_test",
+		Name:            "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
 			Limit:  1,
 			Burst:  500,

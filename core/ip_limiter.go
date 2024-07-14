@@ -23,11 +23,11 @@ func (ipl *IPLimiter) GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error) 
 
 }
 
-func newIPRateLimiter(key string, option RateLimiterOption) *IPLimiter {
+func newIPRateLimiter(name string, option RateLimiterOption) *IPLimiter {
 	return &IPLimiter{
 		RateLimiter: RateLimiter{
 			RateLimiterType: IPRateLimiter,
-			Key:             key,
+			Name:            name,
 			Option:          option,
 			Items:           make(map[string]*RateLimiterItem),
 		},
@@ -36,7 +36,7 @@ func newIPRateLimiter(key string, option RateLimiterOption) *IPLimiter {
 
 func (ipl *IPLimiter) newConsumerIP(ip string) *RateLimiterItem {
 	item := &RateLimiterItem{
-		Key:        ip,
+		Name:       ip,
 		Limiter:    rate.NewLimiter(ipl.Option.Limit, ipl.Option.Burst),
 		LastSeenAt: time.Now(),
 	}
