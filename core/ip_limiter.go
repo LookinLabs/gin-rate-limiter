@@ -20,7 +20,6 @@ func (ipl *IPLimiter) GetConsumerIP(ctx *gin.Context) (*RateLimiterItem, error) 
 
 	ip := ipl.newConsumerIP(consumer)
 	return ip, nil
-
 }
 
 func newIPRateLimiter(name string, option RateLimiterOption) *IPLimiter {
