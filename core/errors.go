@@ -25,8 +25,8 @@ func StatusInternalServerError(ctx *gin.Context, err error) {
 }
 
 func StatusTooManyRequests(ctx *gin.Context, err error) {
-	ctx.JSON(http.StatusTooManyRequests, gin.H{
-		"message": err,
+	ctx.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+		"message": err.Error(),
 		"code":    "TOO_MANY_REQUESTS",
 	})
 }
