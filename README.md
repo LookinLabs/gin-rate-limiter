@@ -47,8 +47,10 @@ func RateLimiterMiddleware() gin.HandlerFunc {
 		RateLimiterType: ratelimiter.IPRateLimiter,
 		Key:             "iplimiter_maximum_requests_for_ip_test",
 		Option: ratelimiter.RateLimiterOption{
-			Limit:  1,
-			Burst:  500,
+		// max of 100 requests and then 10 more requests per second
+		// the rate limiter will reset after 10 second don't receive any requests by the same IP address
+			Limit:  10,
+			Burst:  100,
 			Window: 10 * time.Minute,
 		},
 	})
