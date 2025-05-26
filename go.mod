@@ -1,10 +1,11 @@
 module github.com/lookinlabs/gin-rate-limiter
 
-go 1.21
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	golang.org/x/time v0.11.0
 )
 
